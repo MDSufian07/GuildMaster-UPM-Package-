@@ -1,38 +1,32 @@
+# Unity build folders
 Library/
 Temp/
 Obj/
 obj/
 bin/
-Debug/
 Build/
 Builds/
 Logs/
 UserSettings/
-MemoryCaptures/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build output
+*.dll
+*.exe
+*.pdb
+*.mdb
 *.csproj
-*.unityproj
 *.sln
 *.user
 *.userprefs
-*.pidb
-*.booproj
-*.pdb
-*.mdb
-*.dll
-*.exe
-*.deps.json
-*.runtimeconfig.json
-.vs/
-.vscode/
-.DS_Store
-Thumbs.db
+
+# Node (if used)
 node_modules/
-.idea/
-/[Pp]ackages/*
-!package.json
-!README.md
-!LICENSE
-*.meta
-Program.cs
-build.log
-output.txt
