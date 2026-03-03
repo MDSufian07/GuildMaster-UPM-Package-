@@ -4,7 +4,7 @@ using System.Linq;
 using GuildMaster.Core.Enums;
 using GuildMaster.Core.ValueObjects;
 
-namespace GuildMaster.Core.Entities
+namespace GuildMaster_UPM_Package.Runtime.Core.Entities
 {
     [Serializable]
     public class Adventurer
@@ -26,9 +26,9 @@ namespace GuildMaster.Core.Entities
         public bool IsInjured { get; private set; }
         public int RecoveryTime { get; private set; }
 
-        public AdventurerStatus Status { get; private set; }
+        public GuildMaster_UPM_Package.Runtime.Core.Enums.AdventurerStatus Status { get; private set; }
         
-        public GuildMaster.Core.Enums.InsuranceType InsuranceType { get; private set; }
+        public GuildMaster_UPM_Package.Runtime.Core.Enums.InsuranceType InsuranceType { get; private set; }
 
         public Adventurer(string name,
             Dictionary<StatType, int> stats,
@@ -40,8 +40,8 @@ namespace GuildMaster.Core.Entities
 
             Level = 1;
             XP = 0;
-            Status = AdventurerStatus.Available;
-            InsuranceType = GuildMaster.Core.Enums.InsuranceType.None;
+            Status = GuildMaster_UPM_Package.Runtime.Core.Enums.AdventurerStatus.Available;
+            InsuranceType = GuildMaster_UPM_Package.Runtime.Core.Enums.InsuranceType.None;
 
             UpdateCost();
         }

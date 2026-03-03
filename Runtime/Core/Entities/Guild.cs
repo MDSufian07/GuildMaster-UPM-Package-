@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GuildMaster.Core.Enums;
 
-namespace GuildMaster.Core.Entities
+namespace GuildMaster_UPM_Package.Runtime.Core.Entities
 {
     public class Guild
     {

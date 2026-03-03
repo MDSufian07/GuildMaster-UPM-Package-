@@ -1,10 +1,14 @@
-using GuildMaster.Core.Entities;
-using GuildMaster.Core.ValueObjects;
-using System.Globalization;
+using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace GuildMaster.Systems.SaveManager
+using GuildMaster_UPM_Package.Runtime.Core.Entities;
+using GuildMaster_UPM_Package.Runtime.Core.ValueObjects;
+
+namespace GuildMaster_UPM_Package.Runtime.Systems.SaveManager
 {
 
     public class SaveManagerService
@@ -235,18 +239,18 @@ namespace GuildMaster.Systems.SaveManager
                 var cols = lines[i].Split(Sep);
                 var adv = new AdventurerData();
                 adv.Name = cols.ElementAtOrDefault(0) ?? string.Empty;
-                adv.Level = int.TryParse(cols.ElementAtOrDefault(1), out var lvl) ? lvl : 1;
-                adv.XP = int.TryParse(cols.ElementAtOrDefault(2), out var xp) ? xp : 0;
-                adv.CostPerMission = int.TryParse(cols.ElementAtOrDefault(3), out var cpm) ? cpm : 0;
+                adv.Level = int.TryParse(cols.ElementAtOrDefault(1) ?? string.Empty, out var lvl) ? lvl : 1;
+                adv.XP = int.TryParse(cols.ElementAtOrDefault(2) ?? string.Empty, out var xp) ? xp : 0;
+                adv.CostPerMission = int.TryParse(cols.ElementAtOrDefault(3) ?? string.Empty, out var cpm) ? cpm : 0;
                 adv.Specialty = cols.ElementAtOrDefault(4) ?? string.Empty;
-                adv.IsInjured = bool.TryParse(cols.ElementAtOrDefault(5), out var inj) ? inj : false;
-                adv.RecoveryTime = int.TryParse(cols.ElementAtOrDefault(6), out var rt) ? rt : 0;
+                adv.IsInjured = bool.TryParse(cols.ElementAtOrDefault(5) ?? string.Empty, out var inj) ? inj : false;
+                adv.RecoveryTime = int.TryParse(cols.ElementAtOrDefault(6) ?? string.Empty, out var rt) ? rt : 0;
                 adv.Status = cols.ElementAtOrDefault(7) ?? string.Empty;
-                adv.Combat = int.TryParse(cols.ElementAtOrDefault(8), out var c1) ? c1 : 0;
-                adv.Defense = int.TryParse(cols.ElementAtOrDefault(9), out var c2) ? c2 : 0;
-                adv.Intelligence = int.TryParse(cols.ElementAtOrDefault(10), out var c3) ? c3 : 0;
-                adv.Agility = int.TryParse(cols.ElementAtOrDefault(11), out var c4) ? c4 : 0;
-                adv.Charisma = int.TryParse(cols.ElementAtOrDefault(12), out var c5) ? c5 : 0;
+                adv.Combat = int.TryParse(cols.ElementAtOrDefault(8) ?? string.Empty, out var c1) ? c1 : 0;
+                adv.Defense = int.TryParse(cols.ElementAtOrDefault(9) ?? string.Empty, out var c2) ? c2 : 0;
+                adv.Intelligence = int.TryParse(cols.ElementAtOrDefault(10) ?? string.Empty, out var c3) ? c3 : 0;
+                adv.Agility = int.TryParse(cols.ElementAtOrDefault(11) ?? string.Empty, out var c4) ? c4 : 0;
+                adv.Charisma = int.TryParse(cols.ElementAtOrDefault(12) ?? string.Empty, out var c5) ? c5 : 0;
 
                 result.Add(adv);
             }
