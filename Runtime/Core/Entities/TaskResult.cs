@@ -1,28 +1,31 @@
-namespace GuildMaster.Core.Entities;
+using System.Collections.Generic;
 
-public class TaskResult
+namespace GuildMaster.Core.Entities
 {
-    public bool Success { get; }
-    public float SuccessChance { get; }
-    public int CoinsEarned { get; }
-    public int ReputationChange { get; }
-
-    public Dictionary<Adventurer, int> XPGains { get; }
-    public List<Adventurer> DeadAdventurers { get; }
-
-    public TaskResult(
-        bool success,
-        float successChance,
-        int coins,
-        int reputation,
-        Dictionary<Adventurer, int> xpGains,
-        List<Adventurer> dead)
+    public class TaskResult
     {
-        Success = success;
-        SuccessChance = successChance;
-        CoinsEarned = coins;
-        ReputationChange = reputation;
-        XPGains = xpGains;
-        DeadAdventurers = dead;
+        public bool Success { get; }
+        public float SuccessChance { get; }
+        public int CoinsEarned { get; }
+        public int ReputationChange { get; }
+
+        public Dictionary<Adventurer, int> XPGains { get; }
+        public List<Adventurer> DeadAdventurers { get; }
+
+        public TaskResult(
+            bool success,
+            float successChance,
+            int coins,
+            int reputation,
+            Dictionary<Adventurer, int> xpGains,
+            List<Adventurer> dead)
+        {
+            Success = success;
+            SuccessChance = successChance;
+            CoinsEarned = coins;
+            ReputationChange = reputation;
+            XPGains = xpGains;
+            DeadAdventurers = dead;
+        }
     }
 }

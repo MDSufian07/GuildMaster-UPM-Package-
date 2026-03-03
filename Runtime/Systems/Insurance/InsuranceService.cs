@@ -1,62 +1,57 @@
 using GuildMaster.Core.Entities;
+using GuildMaster.Core.Enums;
 
-namespace GuildMaster.Systems.Insurance;
-
-public abstract class InsuranceService
+namespace GuildMaster.Systems.Insurance
 {
-    // Insurance costs and benefits
-    private const int BasicInsuranceCost = 50;
-    private const int PremiumInsuranceCost = 150;
-    
-    // Basic: Reduces recovery time by 50%
-    // Premium: Prevents death + reduces recovery time by 75%
-    
-    public static bool PurchaseInsurance(Adventurer adventurer, Guild guild, InsuranceType type)
+    public abstract class InsuranceService
     {
-        int cost = type == InsuranceType.Basic ? BasicInsuranceCost : PremiumInsuranceCost;
+        // Insurance costs and benefits
+        private const int BasicInsuranceCost = 50;
+        private const int PremiumInsuranceCost = 150;
         
-        if (guild.Coins < cost)
+        // Basic: Reduces recovery time by 50%
+        // Premium: Prevents death + reduces recovery time by 75%
+        
+        public static bool PurchaseInsurance(Adventurer adventurer, Guild guild, InsuranceType type)
         {
-            return false;
+            int cost = type == InsuranceType.Basic ? BasicInsuranceCost : PremiumInsuranceCost;
+            
+            if (guild.Coins < cost)
+            {
+                return false;
+            }
+            
+            guild.AddCoins(-cost);
+            
+            // Set insurance using reflection
+            adventurer.GetType().GetProperty("InsuranceType")?.SetValue(adventurer, type);
+            
+            return true;
         }
         
-        guild.AddCoins(-cost);
-        
-        // Set insurance using reflection
-        adventurer.GetType().GetProperty("InsuranceType")?.SetValue(adventurer, type);
-        
-        return true;
-    }
-    
-    public static void CancelInsurance(Adventurer adventurer)
-    {
-        adventurer.GetType().GetProperty("InsuranceType")?.SetValue(adventurer, InsuranceType.None);
-    }
-    
-    public static int GetInsuranceCost(InsuranceType type)
-    {
-        return type switch
+        public static void CancelInsurance(Adventurer adventurer)
         {
-            InsuranceType.Basic => BasicInsuranceCost,
-            InsuranceType.Premium => PremiumInsuranceCost,
-            _ => 0
-        };
-    }
-    
-    public static string GetInsuranceBenefits(InsuranceType type)
-    {
-        return type switch
+            adventurer.GetType().GetProperty("InsuranceType")?.SetValue(adventurer, InsuranceType.None);
+        }
+        
+        public static int GetInsuranceCost(InsuranceType type)
         {
-            InsuranceType.Basic => "Reduces injury recovery time by 50%",
-            InsuranceType.Premium => "Prevents death & reduces recovery by 75%",
-            _ => "No insurance coverage"
-        };
+            return type switch
+            {
+                InsuranceType.Basic => BasicInsuranceCost,
+                InsuranceType.Premium => PremiumInsuranceCost,
+                _ => 0
+            };
+        }
+        
+        public static string GetInsuranceBenefits(InsuranceType type)
+        {
+            return type switch
+            {
+                InsuranceType.Basic => "Reduces injury recovery time by 50%",
+                InsuranceType.Premium => "Prevents death & reduces recovery by 75%",
+                _ => "No insurance coverage"
+            };
+        }
     }
-}
-
-public enum InsuranceType
-{
-    None = 0,
-    Basic = 1,
-    Premium = 2
 }
