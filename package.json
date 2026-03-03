@@ -1,0 +1,9 @@
+{
+  "name": "com.ssstudio.guildmaster",
+  "version": "1.0.0",
+  "displayName": "GuildMaster",
+  "description": "GuildMaster UPM package.",
+  "unity": "2020.3",
+  "keywords": ["guild", "rpg"],
+  "author": { "name": "Your Name" }
+}

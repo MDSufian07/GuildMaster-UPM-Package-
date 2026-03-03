@@ -1,0 +1,4 @@
+Name,Level,XP,CostPerMission,Specialty,IsInjured,RecoveryTime,Status,Combat,Defense,Intelligence,Agility,Charisma
+Magnus,2,44,36,Guard,False,0,Available,3,2,1,3,3
+Thorin,2,44,40,Guard,False,0,Available,3,3,3,2,1
+Draven,1,113,40,Craft,True,2,Recovering,2,2,1,2,3
