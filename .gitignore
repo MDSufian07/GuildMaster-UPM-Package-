@@ -1,6 +1,9 @@
 Library/
 Temp/
 Obj/
+obj/
+bin/
+Debug/
 Build/
 Builds/
 Logs/
@@ -15,6 +18,10 @@ MemoryCaptures/
 *.booproj
 *.pdb
 *.mdb
+*.dll
+*.exe
+*.deps.json
+*.runtimeconfig.json
 .vs/
 .vscode/
 .DS_Store
