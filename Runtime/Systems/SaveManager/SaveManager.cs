@@ -1,7 +1,8 @@
 using GuildMaster.Core.Entities;
 using GuildMaster.Core.ValueObjects;
 using System.Globalization;
-using CsvHelper;
+using System.Text;
+using UnityEngine;
 
 namespace GuildMaster.Systems.SaveManager
 {
@@ -11,6 +12,7 @@ namespace GuildMaster.Systems.SaveManager
         private readonly string _savePath = "Saves";
         private readonly string _guildsFile = "guild_data.csv";
         private readonly string _adventurersFile = "adventurers_data.csv";
+        private const char Sep = '|';
 
         public SaveManagerService()
         {
@@ -34,15 +36,11 @@ namespace GuildMaster.Systems.SaveManager
                 // Save adventurer data
                 SaveAdventurerData(guild);
 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("✓ Game saved successfully!");
-                Console.ResetColor();
+                Debug.Log("✓ Game saved successfully!");
             }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"✗ Error saving game: {ex.Message}");
-                Console.ResetColor();
+                Debug.LogError($"✗ Error saving game: {ex.Message}");
             }
         }
 
@@ -57,17 +55,14 @@ namespace GuildMaster.Systems.SaveManager
 
                 if (!File.Exists(guildFilePath))
                 {
-                    Console.WriteLine("No save file found. Starting new game.");
+                    Debug.Log("No save file found. Starting new game.");
                     return null;
                 }
 
-                // Check if file is empty or too small (less than 10 bytes means no valid data)
                 var fileInfo = new FileInfo(guildFilePath);
                 if (fileInfo.Length < 10)
                 {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("Save file is empty or corrupted. Starting new game.");
-                    Console.ResetColor();
+                    Debug.LogWarning("Save file is empty or corrupted. Starting new game.");
 
                     // Delete corrupted files
                     if (File.Exists(guildFilePath))
@@ -83,9 +78,7 @@ namespace GuildMaster.Systems.SaveManager
                 if (guildData == null) return null;
 
                 // Create guild from loaded data
-                var guild = new Guild(guildData.GuildCoins, 3)
-                {
-                };
+                var guild = new Guild(guildData.GuildCoins, 3);
 
                 // Manually set loaded values using reflection
                 guild.GetType().GetProperty("Coins")?.SetValue(guild, guildData.GuildCoins);
@@ -105,46 +98,45 @@ namespace GuildMaster.Systems.SaveManager
                         { StatType.Charisma, advData.Charisma }
                     };
 
-                    if (advData.Specialty != null)
+                    if (!string.IsNullOrEmpty(advData.Specialty))
                     {
-                        var specialty = Enum.Parse<SpecialtyType>(advData.Specialty);
-                        if (advData.Name != null)
+                        if (Enum.TryParse<SpecialtyType>(advData.Specialty, out var specialty))
                         {
-                            var adventurer = new Adventurer(advData.Name, stats, specialty);
-
-                            // Set additional properties
-                            adventurer.GetType().GetProperty("Level")?.SetValue(adventurer, advData.Level);
-                            adventurer.GetType().GetProperty("XP")?.SetValue(adventurer, advData.XP);
-                            adventurer.GetType().GetProperty("CostPerMission")
-                                ?.SetValue(adventurer, advData.CostPerMission);
-                            adventurer.GetType().GetProperty("IsInjured")?.SetValue(adventurer, advData.IsInjured);
-                            adventurer.GetType().GetProperty("RecoveryTime")
-                                ?.SetValue(adventurer, advData.RecoveryTime);
-
-                            if (advData.Status != null)
+                            if (!string.IsNullOrEmpty(advData.Name))
                             {
-                                var status = Enum.Parse<Core.Enums.AdventurerStatus>(advData.Status);
-                                adventurer.GetType().GetProperty("Status")?.SetValue(adventurer, status);
-                            }
+                                var adventurer = new Adventurer(advData.Name, stats, specialty);
 
-                            guild.Adventurers.Add(adventurer);
+                                // Set additional properties
+                                adventurer.GetType().GetProperty("Level")?.SetValue(adventurer, advData.Level);
+                                adventurer.GetType().GetProperty("XP")?.SetValue(adventurer, advData.XP);
+                                adventurer.GetType().GetProperty("CostPerMission")
+                                    ?.SetValue(adventurer, advData.CostPerMission);
+                                adventurer.GetType().GetProperty("IsInjured")?.SetValue(adventurer, advData.IsInjured);
+                                adventurer.GetType().GetProperty("RecoveryTime")
+                                    ?.SetValue(adventurer, advData.RecoveryTime);
+
+                                if (!string.IsNullOrEmpty(advData.Status))
+                                {
+                                    if (Enum.TryParse<Core.Enums.AdventurerStatus>(advData.Status, out var status))
+                                    {
+                                        adventurer.GetType().GetProperty("Status")?.SetValue(adventurer, status);
+                                    }
+                                }
+
+                                guild.Adventurers.Add(adventurer);
+                            }
                         }
                     }
                 }
 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(
-                    $"✓ Game loaded successfully! Guild Level: {guild.GuildLevel}, Adventurers: {guild.Adventurers.Count}");
-                Console.ResetColor();
+                Debug.Log($"✓ Game loaded successfully! Guild Level: {guild.GuildLevel}, Adventurers: {guild.Adventurers.Count}");
 
                 return guild;
             }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"✗ Error loading game: {ex.Message}");
-                Console.WriteLine("Starting new game instead.");
-                Console.ResetColor();
+                Debug.LogError($"✗ Error loading game: {ex.Message}");
+                Debug.Log("Starting new game instead.");
 
                 // Clean up corrupted save files
                 try
@@ -165,90 +157,101 @@ namespace GuildMaster.Systems.SaveManager
         private void SaveGuildData(Guild guild)
         {
             var guildPath = Path.Combine(_savePath, _guildsFile);
-            var guildData = new[]
-            {
-                new
-                {
-                    Coins = guild.Coins,
-                    Reputation = guild.Reputation,
-                    GuildLevel = guild.GuildLevel,
-                    Adventurers = guild.Adventurers.Count,
-                    Timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-                }
-            };
 
-            using (var writer = new StreamWriter(guildPath))
-            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-            {
-                csv.WriteRecords(guildData);
-            }
+            var sb = new StringBuilder();
+            // header
+            sb.AppendLine(string.Join(Sep, new[] { "Coins", "Reputation", "GuildLevel", "Adventurers", "Timestamp" }));
+            // record
+            sb.AppendLine(string.Join(Sep, new[] { guild.Coins.ToString(), guild.Reputation.ToString(), guild.GuildLevel.ToString(), guild.Adventurers.Count.ToString(), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") }));
+
+            File.WriteAllText(guildPath, sb.ToString());
         }
 
         private void SaveAdventurerData(Guild guild)
         {
             var adventurersPath = Path.Combine(_savePath, _adventurersFile);
-            var adventurersData = new List<AdventurerData>();
+            var sb = new StringBuilder();
+
+            var headerFields = new[] { "Name", "Level", "XP", "CostPerMission", "Specialty", "IsInjured", "RecoveryTime", "Status", "Combat", "Defense", "Intelligence", "Agility", "Charisma" };
+            sb.AppendLine(string.Join(Sep, headerFields));
 
             foreach (var adv in guild.Adventurers)
             {
-                adventurersData.Add(new AdventurerData
-                {
-                    Name = adv.Name,
-                    Level = adv.Level,
-                    XP = adv.XP,
-                    CostPerMission = adv.CostPerMission,
-                    Specialty = adv.Specialty.ToString(),
-                    IsInjured = adv.IsInjured,
-                    RecoveryTime = adv.RecoveryTime,
-                    Status = adv.Status.ToString(),
-                    Combat = adv.GetStat(StatType.Combat),
-                    Defense = adv.GetStat(StatType.Defense),
-                    Intelligence = adv.GetStat(StatType.Intelligence),
-                    Agility = adv.GetStat(StatType.Agility),
-                    Charisma = adv.GetStat(StatType.Charisma)
-                });
+                var fields = new[] {
+                    Escape(adv.Name),
+                    adv.Level.ToString(),
+                    adv.XP.ToString(),
+                    adv.CostPerMission.ToString(),
+                    Escape(adv.Specialty.ToString()),
+                    adv.IsInjured.ToString(),
+                    adv.RecoveryTime.ToString(),
+                    Escape(adv.Status.ToString()),
+                    adv.GetStat(StatType.Combat).ToString(),
+                    adv.GetStat(StatType.Defense).ToString(),
+                    adv.GetStat(StatType.Intelligence).ToString(),
+                    adv.GetStat(StatType.Agility).ToString(),
+                    adv.GetStat(StatType.Charisma).ToString()
+                };
+
+                sb.AppendLine(string.Join(Sep, fields));
             }
 
-            using (var writer = new StreamWriter(adventurersPath))
-            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-            {
-                csv.WriteRecords(adventurersData);
-            }
+            File.WriteAllText(adventurersPath, sb.ToString());
         }
 
         private SaveData? LoadGuildData()
         {
             var guildPath = Path.Combine(_savePath, _guildsFile);
 
-            using (var reader = new StreamReader(guildPath))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            var lines = File.ReadAllLines(guildPath);
+            if (lines.Length < 2) return null;
+
+            var header = lines[0].Split(Sep);
+            var values = lines[1].Split(Sep);
+
+            int ParseInt(string? s) => int.TryParse(s, out var v) ? v : 0;
+
+            return new SaveData
             {
-                csv.Read();
-                csv.ReadHeader();
-
-                if (!csv.Read()) return null;
-
-                return new SaveData
-                {
-                    GuildCoins = csv.GetField<int>("Coins"),
-                    GuildReputation = csv.GetField<int>("Reputation"),
-                    GuildLevel = csv.GetField<int>("GuildLevel")
-                };
-            }
+                GuildCoins = ParseInt(values.ElementAtOrDefault(0)),
+                GuildReputation = ParseInt(values.ElementAtOrDefault(1)),
+                GuildLevel = ParseInt(values.ElementAtOrDefault(2))
+            };
         }
 
         private List<AdventurerData> LoadAdventurerData()
         {
             var adventurersPath = Path.Combine(_savePath, _adventurersFile);
 
-            if (!File.Exists(adventurersPath))
-                return new List<AdventurerData>();
+            var result = new List<AdventurerData>();
+            if (!File.Exists(adventurersPath)) return result;
 
-            using (var reader = new StreamReader(adventurersPath))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            var lines = File.ReadAllLines(adventurersPath);
+            if (lines.Length < 2) return result;
+
+            var header = lines[0].Split(Sep);
+            for (int i = 1; i < lines.Length; i++)
             {
-                return csv.GetRecords<AdventurerData>().ToList();
+                var cols = lines[i].Split(Sep);
+                var adv = new AdventurerData();
+                adv.Name = cols.ElementAtOrDefault(0) ?? string.Empty;
+                adv.Level = int.TryParse(cols.ElementAtOrDefault(1), out var lvl) ? lvl : 1;
+                adv.XP = int.TryParse(cols.ElementAtOrDefault(2), out var xp) ? xp : 0;
+                adv.CostPerMission = int.TryParse(cols.ElementAtOrDefault(3), out var cpm) ? cpm : 0;
+                adv.Specialty = cols.ElementAtOrDefault(4) ?? string.Empty;
+                adv.IsInjured = bool.TryParse(cols.ElementAtOrDefault(5), out var inj) ? inj : false;
+                adv.RecoveryTime = int.TryParse(cols.ElementAtOrDefault(6), out var rt) ? rt : 0;
+                adv.Status = cols.ElementAtOrDefault(7) ?? string.Empty;
+                adv.Combat = int.TryParse(cols.ElementAtOrDefault(8), out var c1) ? c1 : 0;
+                adv.Defense = int.TryParse(cols.ElementAtOrDefault(9), out var c2) ? c2 : 0;
+                adv.Intelligence = int.TryParse(cols.ElementAtOrDefault(10), out var c3) ? c3 : 0;
+                adv.Agility = int.TryParse(cols.ElementAtOrDefault(11), out var c4) ? c4 : 0;
+                adv.Charisma = int.TryParse(cols.ElementAtOrDefault(12), out var c5) ? c5 : 0;
+
+                result.Add(adv);
             }
+
+            return result;
         }
 
         /// <summary>
@@ -264,16 +267,14 @@ namespace GuildMaster.Systems.SaveManager
                 if (File.Exists(guildPath)) File.Delete(guildPath);
                 if (File.Exists(adventurersPath)) File.Delete(adventurersPath);
 
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("✓ Save files deleted.");
-                Console.ResetColor();
+                Debug.Log("✓ Save files deleted.");
             }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"✗ Error deleting save: {ex.Message}");
-                Console.ResetColor();
+                Debug.LogError($"✗ Error deleting save: {ex.Message}");
             }
         }
+
+        private static string Escape(string? s) => (s ?? string.Empty).Replace(Sep, ' ').Replace("\n", " ").Replace("\r", " ");
     }
 }
