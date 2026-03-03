@@ -1,6 +1,6 @@
 ﻿{
   "name": "GuildMaster",
-  "rootNamespace": "GuildMaster_UPM_Package",
+  "rootNamespace": "GuildMaster",
   "references": [],
   "optionalUnityReferences": [],
   "includePlatforms": [],
