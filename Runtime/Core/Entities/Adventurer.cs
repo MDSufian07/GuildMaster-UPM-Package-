@@ -1,6 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using GuildMaster.Core.Enums;
 using GuildMaster.Core.ValueObjects;
-using GuildMaster.Systems.Insurance;
 
 namespace GuildMaster.Core.Entities
 {
@@ -17,16 +19,16 @@ namespace GuildMaster.Core.Entities
         public int Level { get; private set; }
         public int XP { get; private set; }
 
-    public SpecialtyType Specialty { get; private set; }
-    public int CostPerMission { get; private set; }
-    public int RecruitmentCost { get; set; }
+        public SpecialtyType Specialty { get; private set; }
+        public int CostPerMission { get; private set; }
+        public int RecruitmentCost { get; set; }
 
-    public bool IsInjured { get; private set; }
-    public int RecoveryTime { get; private set; }
+        public bool IsInjured { get; private set; }
+        public int RecoveryTime { get; private set; }
 
         public AdventurerStatus Status { get; private set; }
         
-        public InsuranceType InsuranceType { get; private set; }
+        public GuildMaster.Core.Enums.InsuranceType InsuranceType { get; private set; }
 
         public Adventurer(string name,
             Dictionary<StatType, int> stats,
@@ -39,7 +41,7 @@ namespace GuildMaster.Core.Entities
             Level = 1;
             XP = 0;
             Status = AdventurerStatus.Available;
-            InsuranceType = InsuranceType.None;
+            InsuranceType = GuildMaster.Core.Enums.InsuranceType.None;
 
             UpdateCost();
         }

@@ -1,81 +1,84 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using GuildMaster.Core.Enums;
 
-namespace GuildMaster.Core.Entities;
-
-public class Guild
+namespace GuildMaster.Core.Entities
 {
-    public int Coins { get; private set; }
-    public int Reputation { get; private set; }
-    public int GuildLevel { get; private set; }
-    private int _initialMaxAdventurers;
-    public int MaxAdventurers 
-    { 
-        get { return _initialMaxAdventurers + ((GuildLevel - 1) * 2); }
-    }
-    public List<Adventurer> Adventurers { get; private set; }
-
-    public Guild(int initialCoins = 500, int maxAdventurers = 3)
+    public class Guild
     {
-        Coins = initialCoins;
-        Reputation = 0;
-        GuildLevel = 1;
-        _initialMaxAdventurers = maxAdventurers;
-        Adventurers = new List<Adventurer>();
-    }
+        public int Coins { get; private set; }
+        public int Reputation { get; private set; }
+        public int GuildLevel { get; private set; }
+        private int _initialMaxAdventurers;
+        public int MaxAdventurers 
+        { 
+            get { return _initialMaxAdventurers + ((GuildLevel - 1) * 2); }
+        }
+        public List<Adventurer> Adventurers { get; private set; }
 
-    public bool CanRecruit()
-    {
-        return Adventurers.Count < MaxAdventurers;
-    }
-
-    public bool TryRecruitAdventurer(Adventurer adventurer, int recruitmentCost)
-    {
-        if (!CanRecruit())
+        public Guild(int initialCoins = 500, int maxAdventurers = 3)
         {
-            return false;
+            Coins = initialCoins;
+            Reputation = 0;
+            GuildLevel = 1;
+            _initialMaxAdventurers = maxAdventurers;
+            Adventurers = new List<Adventurer>();
         }
 
-        if (Coins < recruitmentCost)
+        public bool CanRecruit()
         {
-            return false;
+            return Adventurers.Count < MaxAdventurers;
         }
 
-        Coins -= recruitmentCost;
-        Adventurers.Add(adventurer);
-        return true;
-    }
-
-    public void AddCoins(int amount)
-    {
-        Coins += amount;
-    }
-
-    public void AddReputation(int amount)
-    {
-        Reputation += amount;
-        CheckLevelUp();
-    }
-
-    private void CheckLevelUp()
-    {
-        int requiredReputation = GuildLevel * 10;
-        if (Reputation >= requiredReputation)
+        public bool TryRecruitAdventurer(Adventurer adventurer, int recruitmentCost)
         {
-            int newSlots = MaxAdventurers + 2;
-            GuildLevel++;
-            Console.WriteLine($"\n🎉 GUILD LEVEL UP! Now Level {GuildLevel}!");
-            Console.WriteLine($"📦 Guild slots increased! Now you have {newSlots} slots!");
-            Console.WriteLine("New recruitment options are now available!");
+            if (!CanRecruit())
+            {
+                return false;
+            }
+
+            if (Coins < recruitmentCost)
+            {
+                return false;
+            }
+
+            Coins -= recruitmentCost;
+            Adventurers.Add(adventurer);
+            return true;
         }
-    }
 
-    public int GetAvailableAdventurerCount()
-    {
-        return Adventurers.Count(a => a.Status == AdventurerStatus.Available);
-    }
+        public void AddCoins(int amount)
+        {
+            Coins += amount;
+        }
 
-    public int GetInjuredAdventurerCount()
-    {
-        return Adventurers.Count(a => a.IsInjured);
+        public void AddReputation(int amount)
+        {
+            Reputation += amount;
+            CheckLevelUp();
+        }
+
+        private void CheckLevelUp()
+        {
+            int requiredReputation = GuildLevel * 10;
+            if (Reputation >= requiredReputation)
+            {
+                int newSlots = MaxAdventurers + 2;
+                GuildLevel++;
+                // Use Debug if running in Unity; keep Console for non-Unity builds
+                try { UnityEngine.Debug.Log($"🎉 GUILD LEVEL UP! Now Level {GuildLevel}!"); } catch { Console.WriteLine($"Guild level up: {GuildLevel}"); }
+            }
+        }
+
+        public int GetAvailableAdventurerCount()
+        {
+            return Adventurers.Count(a => a.Status == AdventurerStatus.Available);
+        }
+
+        public int GetInjuredAdventurerCount()
+        {
+            return Adventurers.Count(a => a.IsInjured);
+        }
     }
 }
