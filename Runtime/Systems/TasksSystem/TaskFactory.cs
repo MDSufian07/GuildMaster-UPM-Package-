@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GuildMaster.Core.Entities;
 using GuildMaster.Core.ValueObjects;
 

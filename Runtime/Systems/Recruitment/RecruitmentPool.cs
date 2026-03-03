@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using GuildMaster.Core.Entities;
 using GuildMaster.Core.Enums;
 using GuildMaster.Core.ValueObjects;
@@ -7,7 +10,7 @@ namespace GuildMaster.Systems.Recruitment
 
     public class RecruitmentPool
     {
-        private readonly Random _random = new();
+        private readonly Random _random = new Random();
 
         private readonly string[] _namePool =
         {
@@ -63,7 +66,7 @@ namespace GuildMaster.Systems.Recruitment
 
         private SpecialtyType GetRandomSpecialty()
         {
-            var specialties = Enum.GetValues<SpecialtyType>();
+            var specialties = (SpecialtyType[])Enum.GetValues(typeof(SpecialtyType));
             return specialties[_random.Next(specialties.Length)];
         }
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GuildMaster.Core.ValueObjects;
 
 namespace GuildMaster.Systems.TasksSystem

@@ -1,3 +1,4 @@
+using System;
 using GuildMaster.Core.Entities;
 using GuildMaster.Core.Enums;
 using GuildMaster.Systems.Insurance;
@@ -32,12 +33,7 @@ namespace GuildMaster.Systems.AdventurerService
                 ?.SetValue(adv, AdventurerStatus.Recovering);
                 
             // Show insurance benefit message
-            if (adv.InsuranceType != InsuranceType.None && recoveryDays != adjustedRecoveryDays)
-            {
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine($"   🛡️ {adv.Name}'s {adv.InsuranceType} Insurance reduced recovery: {recoveryDays} → {adjustedRecoveryDays} days");
-                Console.ResetColor();
-            }
+          
         }
 
         public static void HealInstantly(Adventurer adv)
