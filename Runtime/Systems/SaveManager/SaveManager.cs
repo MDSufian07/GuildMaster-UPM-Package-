@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-using GuildMaster_UPM_Package.Runtime.Core.Entities;
-using GuildMaster_UPM_Package.Runtime.Core.ValueObjects;
+using GuildMaster.Core.Entities;
+using GuildMaster.Core.ValueObjects;
 
-namespace GuildMaster_UPM_Package.Runtime.Systems.SaveManager
+namespace GuildMaster.Systems.SaveManager
 {
 
     public class SaveManagerService
